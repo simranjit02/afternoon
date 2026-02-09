@@ -20,6 +20,7 @@ import { useAtom } from "jotai";
 import { atomData } from "./store";
 import { useNavigate } from "react-router-dom";
 import BrandDesigner from "./BrandDesigner";
+import { API_PRODUCTS } from "../config/api";
 
 const Home = () => {
   const navigate = useNavigate();
@@ -36,7 +37,7 @@ const Home = () => {
 
   useEffect(() => {
     axios
-      .get("/Data.json")
+      .get(API_PRODUCTS)
       .then((response) => {
         setGetData(response?.data);
       })

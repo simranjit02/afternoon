@@ -12,6 +12,7 @@ import {
 import { RxCross2 } from "react-icons/rx";
 import PopUpCard from "./PopUpCard";
 import { useNavigate } from "react-router-dom";
+import { API_PRODUCTS } from "../config/api";
 
 const ShopAll = () => {
   const navigate = useNavigate();
@@ -32,7 +33,7 @@ const ShopAll = () => {
   const [, setCartId] = useAtom(atomCartId);
   useEffect(() => {
     axios
-      .get("/Data.json")
+      .get(API_PRODUCTS)
       .then((response) => {
         setGetData(response?.data);
 

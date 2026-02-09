@@ -15,6 +15,7 @@ import { IoIosArrowUp } from "react-icons/io";
 import { IoIosArrowDown } from "react-icons/io";
 import ShowCart from "./ShowCart";
 import { useNavigate } from "react-router-dom";
+import { API_PRODUCTS } from "../config/api";
 
 const PopUpCard = ({ ...prop }) => {
   const navigate = useNavigate();
@@ -38,7 +39,7 @@ const PopUpCard = ({ ...prop }) => {
 
   useEffect(() => {
     axios
-      .get(`/Data.json`)
+      .get(API_PRODUCTS)
       .then((res) => {
         const specificData = res?.data?.find(
           (item) => item?.productId === cardId

@@ -2,6 +2,7 @@ import { useAtom } from "jotai";
 import React, { useEffect, useState } from "react";
 import { cardDetails, showProduct } from "./store";
 import axios from "axios";
+import { API_PRODUCTS } from "../config/api";
 
 const ProductDetailPage = () => {
   const [cardId] = useAtom(cardDetails);
@@ -10,7 +11,7 @@ const ProductDetailPage = () => {
 
   useEffect(() => {
     axios
-      .get("/Data.json")
+      .get(API_PRODUCTS)
       .then((res) => {
         const specificData = res.data.find((val) => val.productId === cardId);
         setIdNo(specificData);

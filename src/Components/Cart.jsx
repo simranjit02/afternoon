@@ -17,6 +17,7 @@ import { FiMinus } from "react-icons/fi";
 import axios from "axios";
 import Buy from "./Buy";
 import { motion } from "framer-motion";
+import { API_PRODUCTS } from "../config/api";
 
 const Cart = () => {
   const [productInfo] = useAtom(atomProductInfo);
@@ -40,7 +41,7 @@ const Cart = () => {
 
   useEffect(() => {
     axios
-      .get(`/Data.json`)
+      .get(API_PRODUCTS)
       .then((res) => {
         setData(res?.data);
       })

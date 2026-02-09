@@ -4,6 +4,7 @@ import { atomCartId, atomProductInfo, cardDetails, cardRender } from "./store";
 import PopUpCard from "./PopUpCard";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { API_PRODUCTS } from "../config/api";
 
 const BestSeller = () => {
   const navigate = useNavigate();
@@ -21,7 +22,7 @@ const BestSeller = () => {
 
   useEffect(() => {
     axios
-      .get("/Data.json")
+      .get(API_PRODUCTS)
       .then((res) => {
         setGetImageData(() => {
           const filteredData = res?.data.filter(

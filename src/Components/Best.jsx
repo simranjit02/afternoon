@@ -14,6 +14,7 @@ import { RxCross2 } from "react-icons/rx";
 
 import PopUpCard from "./PopUpCard";
 import { useNavigate } from "react-router-dom";
+import { API_PRODUCTS } from "../config/api";
 
 const Best = () => {
   const navigate = useNavigate();
@@ -34,7 +35,7 @@ const Best = () => {
 
   useEffect(() => {
     axios
-      .get("/Data.json")
+      .get(API_PRODUCTS)
       .then((response) => {
         setPrevProductLength(() => {
           const filteredData = response?.data.filter(
