@@ -35,25 +35,33 @@ const ShopAll = () => {
     axios
       .get(API_PRODUCTS)
       .then((response) => {
-        setGetData(response?.data);
+        const data = Array.isArray(response?.data) ? response.data : [];
+        setGetData(data);
 
-        setPrevProductLength(() => {
-          const filteredData = response?.data.filter(
-            (product) => product.productPrice <= prevPrice
-          );
-          return filteredData.length;
-        });
-        setGetImageData(() => {
-          const filteredData = response?.data.filter(
-            (product) => product.productPrice <= prevPrice
-          );
-          return filteredData;
-        });
+        const prices = data.map((p) => parseFloat(p.productPrice) || 0).filter((n) => n > 0);
+        const maxPrice = prices.length ? Math.max(...prices) : 85;
+        setPrevPrice(maxPrice);
+        setPrice(maxPrice);
+
+        const filteredData = data.filter(
+          (product) => (parseFloat(product.productPrice) || 0) <= maxPrice
+        );
+        setPrevProductLength(filteredData.length);
+        setGetImageData(filteredData);
       })
       .catch((error) => {
         console.error(error);
       });
-  }, [prevPrice]);
+  }, []);
+
+  useEffect(() => {
+    if (!getData.length) return;
+    const filteredData = getData.filter(
+      (product) => (parseFloat(product.productPrice) || 0) <= prevPrice
+    );
+    setPrevProductLength(filteredData.length);
+    setGetImageData(filteredData);
+  }, [prevPrice, getData]);
 
   useEffect(() => {
     if (priceChangeStop === true) {

@@ -1,12 +1,16 @@
 import { useAtom } from "jotai";
 import React, { useState } from "react";
-import { atomCartItem, atomSendCart, atomShow } from "./store";
+import { atomCartItem, atomSendCart, atomShow, atomIsAuthenticated } from "./store";
 import { IoIosArrowForward } from "react-icons/io";
 
 import { RxCross2 } from "react-icons/rx";
 import { GoPlus } from "react-icons/go";
 import { FiMinus } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
+import {
+  updateCartItemQuantity,
+  removeCartItem,
+} from "../services/cartService";
 
 const ShowCart = () => {
   const navigate = useNavigate();
@@ -15,46 +19,84 @@ const ShowCart = () => {
   const [cartData, setCartData] = useAtom(atomSendCart);
   const [isLoading, setIsLoading] = useState(false);
   const [, setCartItem] = useAtom(atomCartItem);
+  const [isAuthenticated] = useAtom(atomIsAuthenticated);
+
   const notDisplay = (e) => {
     e.stopPropagation();
     setCartt(true);
   };
-  const plus = (productId) => {
-    const updatedCartData = cartData.map((item) => {
-      if (item.newItem.productId === productId) {
-        return {
-          ...item,
-          newItem: { ...item.newItem, quantity: item.newItem.quantity + 1 },
-        };
-      }
-      return item;
-    });
 
-    setCartData(updatedCartData);
+  // Guest: local state. Logged-in: sync to backend then set cart from response.
+  const plus = async (productId) => {
+    if (!isAuthenticated) {
+      const updatedCartData = cartData.map((item) => {
+        if (item.newItem.productId === productId) {
+          return {
+            ...item,
+            newItem: { ...item.newItem, quantity: item.newItem.quantity + 1 },
+          };
+        }
+        return item;
+      });
+      setCartData(updatedCartData);
+      return;
+    }
+    const item = cartData.find((i) => i.newItem.productId === productId);
+    if (!item) return;
+    try {
+      const next = await updateCartItemQuantity(
+        productId,
+        item.newItem.quantity + 1
+      );
+      setCartData(next);
+    } catch (e) {
+      console.warn("Failed to update cart", e);
+    }
   };
 
-  const minus = (productId) => {
-    const updatedCartData = cartData.map((item) => {
-      if (item.newItem.productId === productId && item.newItem.quantity > 1) {
-        return {
-          ...item,
-          newItem: { ...item.newItem, quantity: item.newItem.quantity - 1 },
-        };
-      }
-      return item;
-    });
-
-    setCartData(updatedCartData);
+  const minus = async (productId) => {
+    if (!isAuthenticated) {
+      const updatedCartData = cartData.map((item) => {
+        if (item.newItem.productId === productId && item.newItem.quantity > 1) {
+          return {
+            ...item,
+            newItem: { ...item.newItem, quantity: item.newItem.quantity - 1 },
+          };
+        }
+        return item;
+      });
+      setCartData(updatedCartData);
+      return;
+    }
+    const item = cartData.find((i) => i.newItem.productId === productId);
+    if (!item) return;
+    const newQty = item.newItem.quantity - 1;
+    if (newQty < 1) {
+      removeItem(productId, { stopPropagation: () => {} });
+      return;
+    }
+    try {
+      const next = await updateCartItemQuantity(productId, newQty);
+      setCartData(next);
+    } catch (e) {
+      console.warn("Failed to update cart", e);
+    }
   };
 
-  const removeItem = (product, e) => {
+  const removeItem = async (product, e) => {
     e.stopPropagation();
-
-    setCartData(
-      cartData.filter((item) => {
-        return item.newItem.productId !== product;
-      })
-    );
+    if (!isAuthenticated) {
+      setCartData(
+        cartData.filter((item) => item.newItem.productId !== product)
+      );
+      return;
+    }
+    try {
+      const next = await removeCartItem(product);
+      setCartData(next);
+    } catch (err) {
+      console.warn("Failed to remove from cart", err);
+    }
   };
   const calculateTotal = () => {
     let total = 0;
@@ -73,7 +115,10 @@ const ShowCart = () => {
     }, 2000);
   };
 
-  setCartItem(cartData.length);
+  // Keep cart count in sync for header badge
+  React.useEffect(() => {
+    setCartItem(cartData?.length ?? 0);
+  }, [cartData, setCartItem]);
 
   return (
     <div>

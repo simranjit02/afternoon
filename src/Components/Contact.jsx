@@ -1,8 +1,8 @@
-import React from "react";
-import { useState } from "react";
+import React, { useState } from "react";
 import { motion } from "framer-motion";
-import emailjs from "@emailjs/browser";
+import axios from "axios";
 import toast from "react-hot-toast";
+import { API_INQUIRIES } from "../config/api";
 
 const Contact = () => {
   const initialstage = {
@@ -19,37 +19,31 @@ const Contact = () => {
     setFormData((previousdata) => ({ ...previousdata, [name]: value }));
   };
   const [loading, setLoading] = useState(false);
-  const SubmitForm = (e) => {
+  const SubmitForm = async (e) => {
     e.preventDefault();
     setLoading(true);
-    emailjs
-      .send(
-        "service_ky9cixn",
-        "template_wrz7zax",
-        {
-          name: firstname + lastname,
-          user_email: email,
-          user_name: firstname + lastname,
-          User_number: phone,
-          textmessage: textmessage,
-        },
-        "vzkwQZ1uNnSZb2MOd"
-      )
-      ?.then(() => {
-        setFormData({
-          firstname: "",
-          lastname: "",
-          email: "",
-          phone: "",
-          textmessage: "",
-        });
-        toast("Enquiry send successfully", {
-          duration: 4000,
-          position: "top-right",
-          icon: "👏",
-        });
-        setLoading(false);
+    try {
+      await axios.post(API_INQUIRIES, {
+        firstname,
+        lastname,
+        email,
+        phone,
+        textmessage,
       });
+      setFormData(initialstage);
+      toast.success("Enquiry sent successfully", {
+        duration: 4000,
+        position: "top-right",
+        icon: "👏",
+      });
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Failed to send. Please try again.", {
+        duration: 4000,
+        position: "top-right",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
   return (
     <motion.div

@@ -59,7 +59,7 @@ const BestSeller = () => {
       <div className="mt-[130px] ">
         <div className="w-full flex justify-center items-center h-20 mb-6 ">
           <div className="text-3xl text-black tracking-[.10em]">
-            Bestsellers
+            asdasd
           </div>
         </div>
         <div className="flex justify-center ml-2  ">

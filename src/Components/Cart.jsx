@@ -7,6 +7,7 @@ import {
   atomSendCart,
   atomShow,
   cardDetails,
+  atomIsAuthenticated,
 } from "./store";
 import { HiOutlineChevronLeft, HiOutlineChevronRight } from "react-icons/hi";
 import { IoIosArrowUp } from "react-icons/io";
@@ -17,7 +18,9 @@ import { FiMinus } from "react-icons/fi";
 import axios from "axios";
 import Buy from "./Buy";
 import { motion } from "framer-motion";
+import toast from "react-hot-toast";
 import { API_PRODUCTS } from "../config/api";
+import { addItemToUserCart } from "../services/cartService";
 
 const Cart = () => {
   const [productInfo] = useAtom(atomProductInfo);
@@ -33,6 +36,7 @@ const Cart = () => {
   const [cartData, setCartData] = useAtom(atomSendCart);
   const [cardId] = useAtom(cardDetails);
   const [, setData] = useState([]);
+  const [isAuthenticated] = useAtom(atomIsAuthenticated);
 
   const [buyItem, setBuyItem] = useAtom(atomBuyItem);
   const [buyLoading, setBuyLoading] = useState(false);
@@ -65,36 +69,59 @@ const Cart = () => {
     }
   };
 
-  const addItemToCart = () => {
-    const existingItem = cartData.find(
-      (item) => item.newItem.productId === cardId
-    );
-
-    if (existingItem) {
-      const updatedCartData = cartData.map((item) => {
-        if (item.newItem.productId === cardId) {
-          return {
-            ...item,
-            newItem: {
-              ...item.newItem,
-              quantity: item.newItem.quantity + localAdd,
-            },
-          };
-        }
-        return item;
-      });
-
-      setCartData(updatedCartData);
+  const addItemToCart = async () => {
+    // Use productInfo.productId when cardDetails is empty/array (e.g. initial state)
+    const productId = (typeof cardId === "string" && cardId) ? cardId : productInfo?.productId;
+    if (!productId) {
+      toast.error("Product not loaded. Please try again.");
+      return;
+    }
+    if (isAuthenticated) {
+      try {
+        const product = {
+          productId,
+          imageOne: productInfo?.imageOne,
+          productCategory: productInfo?.productCategory,
+          productName: productInfo?.productCategory,
+          productPrice: productInfo?.productPrice,
+        };
+        const next = await addItemToUserCart(product, localAdd);
+        setCartData(next);
+      } catch (e) {
+        toast.error(e.response?.data?.message || e.message || "Failed to add to cart");
+        return;
+      }
     } else {
-      const newItem = {
-        productId: cardId,
-        imageOne: productInfo?.imageOne,
-        productCategory: productInfo?.productCategory,
-        productPrice: productInfo?.productPrice,
-        quantity: localAdd,
-      };
+      const existingItem = cartData.find(
+        (item) => item.newItem.productId === productId
+      );
 
-      setCartData((prevItems) => [...prevItems, { newItem }]);
+      if (existingItem) {
+        const updatedCartData = cartData.map((item) => {
+          if (item.newItem.productId === productId) {
+            return {
+              ...item,
+              newItem: {
+                ...item.newItem,
+                quantity: item.newItem.quantity + localAdd,
+              },
+            };
+          }
+          return item;
+        });
+
+        setCartData(updatedCartData);
+      } else {
+        const newItem = {
+          productId,
+          imageOne: productInfo?.imageOne,
+          productCategory: productInfo?.productCategory,
+          productPrice: productInfo?.productPrice,
+          quantity: localAdd,
+        };
+
+        setCartData((prevItems) => [...prevItems, { newItem }]);
+      }
     }
 
     setCartt(true);

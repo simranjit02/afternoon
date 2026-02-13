@@ -8,6 +8,7 @@ import {
   atomShow,
   cardDetails,
   cardRender,
+  atomIsAuthenticated,
 } from "./store";
 import axios from "axios";
 import { FiCircle } from "react-icons/fi";
@@ -15,7 +16,9 @@ import { IoIosArrowUp } from "react-icons/io";
 import { IoIosArrowDown } from "react-icons/io";
 import ShowCart from "./ShowCart";
 import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 import { API_PRODUCTS } from "../config/api";
+import { addItemToUserCart } from "../services/cartService";
 
 const PopUpCard = ({ ...prop }) => {
   const navigate = useNavigate();
@@ -36,6 +39,7 @@ const PopUpCard = ({ ...prop }) => {
   const [localAdd, setLocalAdd] = useState(1);
   const [, setProductInfo] = useAtom(atomProductInfo);
   const [loading, setLoading] = useState(false);
+  const [isAuthenticated] = useAtom(atomIsAuthenticated);
 
   useEffect(() => {
     axios
@@ -56,36 +60,59 @@ const PopUpCard = ({ ...prop }) => {
     setSelectedImage(image);
   };
 
-  const addItemToCart = () => {
-    const existingItem = cartData.find(
-      (item) => item.newItem.productId === cardId
-    );
-
-    if (existingItem) {
-      const updatedCartData = cartData.map((item) => {
-        if (item.newItem.productId === cardId) {
-          return {
-            ...item,
-            newItem: {
-              ...item.newItem,
-              quantity: item.newItem.quantity + localAdd,
-            },
-          };
-        }
-        return item;
-      });
-
-      setCartData(updatedCartData);
+  const addItemToCart = async () => {
+    // cardDetails can be [] (initial state); use popData.productId as fallback
+    const productId = (typeof cardId === "string" && cardId) ? cardId : popData?.productId;
+    if (!productId) {
+      toast.error("Product not loaded. Please try again.");
+      return;
+    }
+    if (isAuthenticated) {
+      try {
+        const product = {
+          productId,
+          imageOne: popData?.imageOne,
+          productCategory: popData?.productCategory,
+          productName: popData?.productCategory,
+          productPrice: popData?.productPrice,
+        };
+        const next = await addItemToUserCart(product, localAdd);
+        setCartData(next);
+      } catch (e) {
+        toast.error(e.response?.data?.message || e.message || "Failed to add to cart");
+        return;
+      }
     } else {
-      const newItem = {
-        productId: cardId,
-        imageOne: popData?.imageOne,
-        productCategory: popData?.productCategory,
-        productPrice: popData?.productPrice,
-        quantity: localAdd,
-      };
+      const existingItem = cartData.find(
+        (item) => item.newItem.productId === productId
+      );
 
-      setCartData((prevItems) => [...prevItems, { newItem }]);
+      if (existingItem) {
+        const updatedCartData = cartData.map((item) => {
+          if (item.newItem.productId === productId) {
+            return {
+              ...item,
+              newItem: {
+                ...item.newItem,
+                quantity: item.newItem.quantity + localAdd,
+              },
+            };
+          }
+          return item;
+        });
+
+        setCartData(updatedCartData);
+      } else {
+        const newItem = {
+          productId,
+          imageOne: popData?.imageOne,
+          productCategory: popData?.productCategory,
+          productPrice: popData?.productPrice,
+          quantity: localAdd,
+        };
+
+        setCartData((prevItems) => [...prevItems, { newItem }]);
+      }
     }
 
     setPopUp(false);

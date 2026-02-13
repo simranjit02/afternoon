@@ -19,11 +19,15 @@ import Best from "./Components/Best";
 import Contact from "./Components/Contact";
 import { Toaster } from "react-hot-toast";
 import Cart from "./Components/Cart";
+import SignIn from "./Components/SignIn";
+import SignUp from "./Components/SignUp";
+import AuthCartInit from "./Components/AuthCartInit";
 
 function App() {
   return (
     <>
       <Toaster />
+      <AuthCartInit />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route
@@ -111,6 +115,22 @@ function App() {
           element={
             <LayoutCart>
               <ViewCart />
+            </LayoutCart>
+          }
+        />
+        <Route
+          path="/signin"
+          element={
+            <LayoutCart>
+              <SignIn />
+            </LayoutCart>
+          }
+        />
+        <Route
+          path="/signup"
+          element={
+            <LayoutCart>
+              <SignUp />
             </LayoutCart>
           }
         />
