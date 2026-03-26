@@ -101,7 +101,7 @@ const Sidebar = () => {
           <div className="">
             <div className="text-2xl gap-x-2 flex  text-gray-500 border-b-[1px] pr-[90px] pb-[20px] mt-[100px] border-[#D9D9D9] mb-[12px]">
               <span className="">Filter</span>
-              <span className="">by</span>
+              <span className="">By</span>
             </div>
           </div>
 
@@ -127,7 +127,7 @@ const Sidebar = () => {
                     onMouseUp={handleMouseUp}
                     className=" w-[100px]  bg-[#D9D9D9]  "
                   />
-                  <span className="ml-2 text-sm">${price.toFixed(2)}</span>
+                  <span className="ml-2 text-sm">₹{price.toFixed(2)}</span>
                 </div>
               </div>
             )}

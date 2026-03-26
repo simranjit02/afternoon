@@ -71,7 +71,8 @@ const Cart = () => {
 
   const addItemToCart = async () => {
     // Use productInfo.productId when cardDetails is empty/array (e.g. initial state)
-    const productId = (typeof cardId === "string" && cardId) ? cardId : productInfo?.productId;
+    const productId =
+      typeof cardId === "string" && cardId ? cardId : productInfo?.productId;
     if (!productId) {
       toast.error("Product not loaded. Please try again.");
       return;
@@ -88,12 +89,14 @@ const Cart = () => {
         const next = await addItemToUserCart(product, localAdd);
         setCartData(next);
       } catch (e) {
-        toast.error(e.response?.data?.message || e.message || "Failed to add to cart");
+        toast.error(
+          e.response?.data?.message || e.message || "Failed to add to cart",
+        );
         return;
       }
     } else {
       const existingItem = cartData.find(
-        (item) => item.newItem.productId === productId
+        (item) => item.newItem.productId === productId,
       );
 
       if (existingItem) {
@@ -253,7 +256,7 @@ const Cart = () => {
                 {productInfo.productCategory}
               </div>
               <div className="text-2xl text-[#5C5757]">
-                ${productInfo.productPrice}
+                ₹{productInfo.productPrice}
               </div>
               <div className="mt-[30px] mb-1 text-lg select-none">Quantity</div>
 

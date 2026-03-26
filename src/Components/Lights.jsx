@@ -37,7 +37,7 @@ const Lights = () => {
           const filteredData = response?.data.filter(
             (product) =>
               product.productCategory === "Lighting" &&
-              product.productPrice <= prevPrice
+              product.productPrice <= prevPrice,
           );
           return filteredData.length;
         });
@@ -46,7 +46,7 @@ const Lights = () => {
           const filteredData = response?.data.filter(
             (product) =>
               product.productCategory === "Lighting" &&
-              product.productPrice <= prevPrice
+              product.productPrice <= prevPrice,
           );
           return filteredData;
         });
@@ -95,7 +95,7 @@ const Lights = () => {
         {price < 85.0 && (
           <div className="flex items-center gap-x-2 mb-4">
             <div className="flex gap-x-2 items-center w-fit px-3 ml-3 bg-gray-300">
-              <div className="">$59.50 -${prevPrice}</div>
+              <div className="">₹59.50 -₹{prevPrice}</div>
               <RxCross2
                 onClick={resetPrice}
                 size={15}
@@ -187,7 +187,7 @@ const Lights = () => {
               {/* product description */}
               <div className="mt-2 text-lg flex -ml-16 flex-col items-center">
                 <div className="">{product.productCategory}</div>
-                <div className="  ">{product.productPrice}</div>
+                <div className="  ">₹{product.productPrice}</div>
               </div>
             </div>
           ))}

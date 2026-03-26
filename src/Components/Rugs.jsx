@@ -37,7 +37,7 @@ const Rugs = () => {
           const filteredData = response?.data.filter(
             (product) =>
               product.productCategory === "Rug" &&
-              product.productPrice <= prevPrice
+              product.productPrice <= prevPrice,
           );
           return filteredData.length;
         });
@@ -46,7 +46,7 @@ const Rugs = () => {
           const filteredData = response?.data.filter(
             (product) =>
               product.productCategory === "Rug" &&
-              product.productPrice <= prevPrice
+              product.productPrice <= prevPrice,
           );
           return filteredData;
         });
@@ -194,7 +194,7 @@ const Rugs = () => {
                 {/* product description */}
                 <div className="mt-2 -ml-16 text-lg flex flex-col items-center">
                   <div className="">{product.productCategory}</div>
-                  <div className="  ">{product.productPrice}</div>
+                  <div className="  ">₹{product.productPrice}</div>
                 </div>
               </div>
             ))}

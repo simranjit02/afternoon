@@ -1,6 +1,11 @@
 import { useAtom } from "jotai";
 import React, { useState } from "react";
-import { atomCartItem, atomSendCart, atomShow, atomIsAuthenticated } from "./store";
+import {
+  atomCartItem,
+  atomSendCart,
+  atomShow,
+  atomIsAuthenticated,
+} from "./store";
 import { IoIosArrowForward } from "react-icons/io";
 
 import { RxCross2 } from "react-icons/rx";
@@ -46,7 +51,7 @@ const ShowCart = () => {
     try {
       const next = await updateCartItemQuantity(
         productId,
-        item.newItem.quantity + 1
+        item.newItem.quantity + 1,
       );
       setCartData(next);
     } catch (e) {
@@ -87,7 +92,7 @@ const ShowCart = () => {
     e.stopPropagation();
     if (!isAuthenticated) {
       setCartData(
-        cartData.filter((item) => item.newItem.productId !== product)
+        cartData.filter((item) => item.newItem.productId !== product),
       );
       return;
     }
@@ -126,11 +131,11 @@ const ShowCart = () => {
         onClick={() => {
           setCartt(false);
         }}
-        className="fixed  top-0 left-0 w-full h-full bg-[#808080] bg-opacity-50 z-30"
+        className="fixed top-0 left-0 w-full h-full bg-[#808080] bg-opacity-50 z-30"
       >
         <div
           onClick={notDisplay}
-          className={`top-0 right-0 w-[18vw] bg-white flex flex-col justify-between text-white absolute h-full z-40 border  ease-in-out duration-400 ${
+          className={`top-0 right-0 w-[24vw] bg-white flex flex-col justify-between text-white absolute h-full z-40 border  ease-in-out duration-400 ${
             cartt ? "translate-x-0 " : "translate-x-full "
           }`}
         >
@@ -168,7 +173,7 @@ const ShowCart = () => {
                       {item.newItem.productCategory}
                     </div>
                     <div className="text-md font-bold text-[#5C5757] select-none">
-                      ${item.newItem.productPrice}
+                      ₹{item.newItem.productPrice}
                     </div>
                     <div className="">
                       <div className="border w-fit px-1  py-[1px]  flex justify-between gap-x-3 items-center mt-[7px]">
@@ -206,7 +211,7 @@ const ShowCart = () => {
           {/* total part */}
           <div className="mb-[100px] ml-6 select-none">
             <div className="text-black text-2xl">
-              Subtotal : ${calculateTotal().toFixed(2)}
+              Subtotal : ₹{calculateTotal().toFixed(2)}
             </div>
             <div
               onClick={handleLoading}
